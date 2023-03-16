@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'config_screen.dart';
 import 'constant.dart';
 
+
+
 class HomeScreen extends StatefulWidget {
   final String email;
   const HomeScreen({super.key, required this.email});
@@ -56,7 +58,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: TextInputField(
                     initalvalue: 'D0999',
                     controller: _serialId,
-                    labelText: 'Device ID',
+                    labelText: 'Serial ID',
+                    
                     icon: Icons.devices,
                   ),
                 ),
@@ -67,7 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: TextInputField(
                     initalvalue: '1234',
                     controller: _securityKey,
-                    labelText: 'Serial ID',
+                    labelText: 'Device ID',
                     icon: Icons.devices,
                     // isObscure: true,
                   ),
@@ -88,30 +91,8 @@ class _HomeScreenState extends State<HomeScreen> {
               textColor: Colors.white,
               color: buttonColor,
               child: const Text('Register'),
-              onPressed: () async {
-                // Future RegistrationUser() async {
-                var APIURL =
-                    "https://uo1t934012.execute-api.us-east-1.amazonaws.com//addNewDevice";
-                // as Uri;
-
-                // Map mapeddate = {
-                //   'device_id': _securityKey.text,
-                //   'serial_id': _serialId.text
-                // };
-                var body = jsonEncode({
-                  'device_id': _serialId.text,
-                  'serial_id': _securityKey.text
-                });
-                print("JSON DATA: ${body}");
-
-                http.Response response =
-                    await http.post(Uri.parse(APIURL), body: body);
-
-                var data = jsonDecode(response.body);
-
-                print("DATA: ${data}");
-                // }
-
+              onPressed: () {
+                RegistrationUser();
                 Navigator.of(context).pop();
               },
             ),
@@ -120,7 +101,34 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
   }
+  Future RegistrationUser() async {
+    var APIURL = Uri.parse("https://uo1t934012.execute-api.us-east-1.amazonaws.com//addNewDevice");    
+    Map mapeddate ={
+      'device_id':_securityKey.text,
+      'serial_id':_serialId.text
+    };
+    String requestBody = jsonEncode(mapeddate);
+    print("JSON DATA: ${requestBody}");
+    http.Response response = await http.post(APIURL,body:requestBody);
 
+    var data = jsonDecode(response.body);
+
+    print("DATA: ${data}");
+
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text('Response Data'),
+        content: Text(data.toString()),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text("Close"),
+          ),
+        ],
+      ),
+    );    
+  }
 // {email: milanpreetkaur502@gmail.com, serialID: D0314, deviceBooted: true, deviceProvisoned: true}
 
   @override
